@@ -8,14 +8,14 @@ A comprehensive data analysis and visualization tool for real estate market insi
 - **Statistical Analysis**: Detailed statistical insights including regression analysis
 - **Market Insights**: Automated market analysis and predictions
 - **Advanced Filtering**: Multi-parameter filtering system for data exploration
-- **Dark/Light Theme**: Responsive UI with theme support
+- **Dark Theme**: Responsive UI with theme support
 
 ## Installation
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/thinklytics.git
-cd thinklytics
+git clone https://github.com/Mfahad159/Thinklytics.git
+cd Thinklytics
 ```
 
 2. Create a virtual environment (recommended):
@@ -32,15 +32,18 @@ pip install -r requirements.txt
 ## Project Structure
 
 ```
-project_root/
+Thinklytics/
 ├── main/
 │   ├── analysis.py      # Statistical analysis functions
 │   ├── utils.py         # Utility functions
-│   └── app.py          # Main Streamlit application
+│   ├── app.py          # Main Streamlit application
+│   ├── summary.py      # Market insights and predictions
+│   └── statistical_analysis.py  # Advanced statistical methods
 ├── data/
 │   └── zameen_rentals_data.csv  # Dataset
 ├── requirements.txt     # Project dependencies
-└── README.md           # Project documentation
+├── README.md           # Project documentation
+└── .gitignore          # Git ignore rules
 ```
 
 ## Usage
@@ -94,10 +97,6 @@ streamlit run main/app.py
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgments
 
