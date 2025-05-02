@@ -68,14 +68,42 @@ def analyze_distributions(df: pd.DataFrame, column: str) -> Dict:
 
 def create_qq_plot(df: pd.DataFrame, column: str, theme: str) -> plt.Figure:
     """Create QQ plot for normality testing."""
-    plt.figure(figsize=(10, 6))
+    # Reduce figure size by 10%
+    fig = plt.figure(figsize=(9, 5.4), facecolor='none')  # Set transparent background
+    ax = fig.add_subplot(111)
+    
     if theme == "Dark":
         plt.style.use('dark_background')
+        ax.set_facecolor('none')  # Transparent axis background
+        # Set text colors for dark theme
+        ax.xaxis.label.set_color('white')
+        ax.yaxis.label.set_color('white')
+        ax.title.set_color('white')
+        ax.tick_params(colors='white')
+        for spine in ax.spines.values():
+            spine.set_color('white')
+    else:
+        ax.set_facecolor('none')  # Transparent axis background
+        # Set text colors for light theme
+        ax.xaxis.label.set_color('black')
+        ax.yaxis.label.set_color('black')
+        ax.title.set_color('black')
+        ax.tick_params(colors='black')
+        for spine in ax.spines.values():
+            spine.set_color('black')
     
     stats.probplot(df[column].dropna(), dist="norm", plot=plt)
-    plt.title(f'Q-Q Plot for {column}')
-    plt.grid(True, alpha=0.3)
-    return plt
+    plt.title(f'Q-Q Plot for {column}', pad=15, fontsize=14, fontweight='bold')
+    plt.grid(True, alpha=0.2, color='white' if theme == "Dark" else 'black')
+    
+    # Adjust layout to prevent cutoff
+    plt.tight_layout(pad=1.5)
+    
+    # Set figure background to transparent
+    fig.patch.set_alpha(0.0)
+    ax.patch.set_alpha(0.0)
+    
+    return fig
 
 def perform_regression_analysis(df: pd.DataFrame, target: str, features: List[str]) -> Dict:
     """Perform multiple regression analysis."""
@@ -110,12 +138,33 @@ def perform_regression_analysis(df: pd.DataFrame, target: str, features: List[st
 
 def create_distribution_plots(df: pd.DataFrame, column: str, theme: str) -> plt.Figure:
     """Create distribution plots with fitted normal curve."""
-    plt.figure(figsize=(12, 6))
+    # Reduce figure size by 10%
+    fig = plt.figure(figsize=(10.8, 5.4), facecolor='none')  # Set transparent background
+    ax = fig.add_subplot(111)
+    
     if theme == "Dark":
         plt.style.use('dark_background')
+        ax.set_facecolor('none')  # Transparent axis background
+        # Set text colors for dark theme
+        ax.xaxis.label.set_color('white')
+        ax.yaxis.label.set_color('white')
+        ax.title.set_color('white')
+        ax.tick_params(colors='white')
+        for spine in ax.spines.values():
+            spine.set_color('white')
+    else:
+        ax.set_facecolor('none')  # Transparent axis background
+        # Set text colors for light theme
+        ax.xaxis.label.set_color('black')
+        ax.yaxis.label.set_color('black')
+        ax.title.set_color('black')
+        ax.tick_params(colors='black')
+        for spine in ax.spines.values():
+            spine.set_color('black')
     
     # Histogram
-    sns.histplot(data=df, x=column, kde=True, color='#4CAF50' if theme == "Dark" else '#1f77b4')
+    sns.histplot(data=df, x=column, kde=True, color='#4CAF50' if theme == "Dark" else '#1f77b4', 
+                alpha=0.8, ax=ax)
     
     # Fit normal distribution
     mu, std = stats.norm.fit(df[column].dropna())
@@ -124,17 +173,45 @@ def create_distribution_plots(df: pd.DataFrame, column: str, theme: str) -> plt.
     p = stats.norm.pdf(x, mu, std)
     plt.plot(x, p * len(df) * (xmax - xmin) / 30, 'r', linewidth=2)
     
-    plt.title(f'Distribution of {column} with Normal Fit')
-    plt.xlabel(column)
-    plt.ylabel('Frequency')
-    plt.grid(True, alpha=0.3)
-    return plt
+    plt.title(f'Distribution of {column} with Normal Fit', pad=15, fontsize=14, fontweight='bold')
+    plt.xlabel(column, fontsize=11)
+    plt.ylabel('Frequency', fontsize=11)
+    plt.grid(True, alpha=0.2, color='white' if theme == "Dark" else 'black')
+    
+    # Adjust layout to prevent cutoff
+    plt.tight_layout(pad=1.5)
+    
+    # Set figure background to transparent
+    fig.patch.set_alpha(0.0)
+    ax.patch.set_alpha(0.0)
+    
+    return fig
 
 def create_prediction_plot(df: pd.DataFrame, target: str, feature: str, theme: str) -> plt.Figure:
     """Create regression plot with prediction intervals."""
-    plt.figure(figsize=(12, 6))
+    # Reduce figure size by 10%
+    fig = plt.figure(figsize=(10.8, 5.4), facecolor='none')  # Set transparent background
+    ax = fig.add_subplot(111)
+    
     if theme == "Dark":
         plt.style.use('dark_background')
+        ax.set_facecolor('none')  # Transparent axis background
+        # Set text colors for dark theme
+        ax.xaxis.label.set_color('white')
+        ax.yaxis.label.set_color('white')
+        ax.title.set_color('white')
+        ax.tick_params(colors='white')
+        for spine in ax.spines.values():
+            spine.set_color('white')
+    else:
+        ax.set_facecolor('none')  # Transparent axis background
+        # Set text colors for light theme
+        ax.xaxis.label.set_color('black')
+        ax.yaxis.label.set_color('black')
+        ax.title.set_color('black')
+        ax.tick_params(colors='black')
+        for spine in ax.spines.values():
+            spine.set_color('black')
     
     # Fit regression
     X = sm.add_constant(df[feature])
@@ -150,9 +227,17 @@ def create_prediction_plot(df: pd.DataFrame, target: str, feature: str, theme: s
     plt.fill_between(df[feature], pred_intervals[:, 0], pred_intervals[:, 1], 
                     color='gray', alpha=0.2, label='95% Prediction Interval')
     
-    plt.title(f'{target} vs {feature} with Prediction Intervals')
-    plt.xlabel(feature)
-    plt.ylabel(target)
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    return plt 
+    plt.title(f'{target} vs {feature} with Prediction Intervals', pad=15, fontsize=14, fontweight='bold')
+    plt.xlabel(feature, fontsize=11)
+    plt.ylabel(target, fontsize=11)
+    plt.legend(fontsize=10)
+    plt.grid(True, alpha=0.2, color='white' if theme == "Dark" else 'black')
+    
+    # Adjust layout to prevent cutoff
+    plt.tight_layout(pad=1.5)
+    
+    # Set figure background to transparent
+    fig.patch.set_alpha(0.0)
+    ax.patch.set_alpha(0.0)
+    
+    return fig 

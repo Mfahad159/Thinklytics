@@ -389,6 +389,17 @@ def apply_theme(theme):
                     font-size: 0.65rem;
                 }
             }
+            /* Add these styles for plot containers */
+            [data-testid="stImage"], [data-testid="stPlotlyChart"] {
+                background-color: transparent !important;
+            }
+            .element-container div[data-testid="stVerticalBlock"] {
+                background-color: transparent !important;
+            }
+            /* Make sure pyplot output is transparent */
+            .stMarkdown div[data-testid="stMarkdownContainer"] > div {
+                background-color: transparent !important;
+            }
             </style>
         """, unsafe_allow_html=True)
     else:
@@ -741,53 +752,131 @@ logger = logging.getLogger(__name__)
 
 def create_heatmap(df, theme):
     """Create a correlation heatmap."""
-    plt.figure(figsize=(10, 7))
+    fig = plt.figure(figsize=(9, 6.3), facecolor='none')  # Set transparent background
+    ax = fig.add_subplot(111)
     numeric_df = df.select_dtypes(include=[np.number])
     correlation_matrix = numeric_df.corr()
     
     if theme == "Dark":
         plt.style.use('dark_background')
+        ax.set_facecolor('none')  # Transparent axis background
         sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f', 
-                   linewidths=0.5, cbar_kws={'label': 'Correlation'})
+                   linewidths=0.5, cbar_kws={'label': 'Correlation'}, ax=ax,
+                   annot_kws={'color': 'white'})
+        # Set text colors for dark theme
+        ax.xaxis.label.set_color('white')
+        ax.yaxis.label.set_color('white')
+        ax.title.set_color('white')
+        ax.tick_params(colors='white')
+        for spine in ax.spines.values():
+            spine.set_color('white')
     else:
+        ax.set_facecolor('none')  # Transparent axis background
         sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f', 
-                   linewidths=0.5, cbar_kws={'label': 'Correlation'})
+                   linewidths=0.5, cbar_kws={'label': 'Correlation'}, ax=ax,
+                   annot_kws={'color': 'black'})
+        # Set text colors for light theme
+        ax.xaxis.label.set_color('black')
+        ax.yaxis.label.set_color('black')
+        ax.title.set_color('black')
+        ax.tick_params(colors='black')
+        for spine in ax.spines.values():
+            spine.set_color('black')
     
-    plt.title('Correlation Heatmap of Numeric Features', pad=20)
-    plt.tight_layout()
-    return plt
+    plt.title('Correlation Heatmap of Numeric Features', pad=15, fontsize=14, fontweight='bold')
+    plt.tight_layout(pad=1.5)
+    
+    # Set figure background to transparent
+    fig.patch.set_alpha(0.0)
+    ax.patch.set_alpha(0.0)
+    
+    return fig
 
 def create_price_distribution(df, theme):
     """Create price distribution plot."""
-    plt.figure(figsize=(8, 4))
+    # Reduce figure size by 10%
+    fig = plt.figure(figsize=(7.2, 3.6), facecolor='none')  # Set transparent background
+    ax = fig.add_subplot(111)
+    
     if theme == "Dark":
         plt.style.use('dark_background')
-        plt.hist(df['Price'], bins=30, color='#4CAF50', edgecolor='white')
+        ax.set_facecolor('none')  # Transparent axis background
+        plt.hist(df['Price'], bins=30, color='#4CAF50', edgecolor='white', alpha=0.8)
+        # Set text colors for dark theme
+        ax.xaxis.label.set_color('white')
+        ax.yaxis.label.set_color('white')
+        ax.title.set_color('white')
+        ax.tick_params(colors='white')
+        for spine in ax.spines.values():
+            spine.set_color('white')
     else:
-        plt.hist(df['Price'], bins=30, color='#1f77b4', edgecolor='black')
+        ax.set_facecolor('none')  # Transparent axis background
+        plt.hist(df['Price'], bins=30, color='#1f77b4', edgecolor='black', alpha=0.8)
+        # Set text colors for light theme
+        ax.xaxis.label.set_color('black')
+        ax.yaxis.label.set_color('black')
+        ax.title.set_color('black')
+        ax.tick_params(colors='black')
+        for spine in ax.spines.values():
+            spine.set_color('black')
     
-    plt.title('Price Distribution', pad=20, y=1.05, fontsize=16, fontweight='bold')
-    plt.xlabel('Price (Rs.)', fontsize=12)
-    plt.ylabel('Frequency', fontsize=12)
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    return plt
+    plt.title('Price Distribution', pad=15, fontsize=14, fontweight='bold')
+    plt.xlabel('Price (Rs.)', fontsize=11)
+    plt.ylabel('Frequency', fontsize=11)
+    plt.grid(True, alpha=0.2, color='white' if theme == "Dark" else 'black')
+    
+    # Adjust layout to prevent cutoff
+    plt.tight_layout(pad=1.5)
+    
+    # Set figure background to transparent
+    fig.patch.set_alpha(0.0)
+    ax.patch.set_alpha(0.0)
+    
+    return fig
 
 def create_regression_analysis(df, theme):
     """Create regression analysis plots."""
-    plt.figure(figsize=(10, 6))
+    # Reduce figure size by 10%
+    fig = plt.figure(figsize=(9, 5.4), facecolor='none')  # Set transparent background
+    ax = fig.add_subplot(111)
+    
     if theme == "Dark":
         plt.style.use('dark_background')
-        sns.regplot(x='Marla', y='Price', data=df, color='#4CAF50')
+        ax.set_facecolor('none')  # Transparent axis background
+        sns.regplot(x='Marla', y='Price', data=df, color='#4CAF50', 
+                   scatter_kws={'alpha':0.5}, ax=ax)
+        # Set text colors for dark theme
+        ax.xaxis.label.set_color('white')
+        ax.yaxis.label.set_color('white')
+        ax.title.set_color('white')
+        ax.tick_params(colors='white')
+        for spine in ax.spines.values():
+            spine.set_color('white')
     else:
-        sns.regplot(x='Marla', y='Price', data=df, color='#1f77b4')
+        ax.set_facecolor('none')  # Transparent axis background
+        sns.regplot(x='Marla', y='Price', data=df, color='#1f77b4', 
+                   scatter_kws={'alpha':0.5}, ax=ax)
+        # Set text colors for light theme
+        ax.xaxis.label.set_color('black')
+        ax.yaxis.label.set_color('black')
+        ax.title.set_color('black')
+        ax.tick_params(colors='black')
+        for spine in ax.spines.values():
+            spine.set_color('black')
     
-    plt.title('Price vs Property Size (Marla)', pad=20)
-    plt.xlabel('Property Size (Marla)')
-    plt.ylabel('Price (Rs.)')
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    return plt
+    plt.title('Price vs Property Size (Marla)', pad=15, fontsize=14, fontweight='bold')
+    plt.xlabel('Property Size (Marla)', fontsize=11)
+    plt.ylabel('Price (Rs.)', fontsize=11)
+    plt.grid(True, alpha=0.2, color='white' if theme == "Dark" else 'black')
+    
+    # Adjust layout to prevent cutoff
+    plt.tight_layout(pad=1.5)
+    
+    # Set figure background to transparent
+    fig.patch.set_alpha(0.0)
+    ax.patch.set_alpha(0.0)
+    
+    return fig
 
 # Error Handling Classes
 class DataLoadError(Exception):
@@ -916,7 +1005,7 @@ def main():
         # Tabs for different sections
         tab1, tab2, tab3, tab4 = st.tabs([
             "Trends", 
-            "Analysis", 
+            "Standard Analysis", 
             "Insights",
             "Statistical Analysis"
         ])
@@ -935,20 +1024,45 @@ def main():
             fig_location = px.bar(
                 x=location_counts.index,
                 y=location_counts.values,
-                title='Top 10 Locations by Property Count',
                 template='plotly_dark' if theme == "Dark" else 'plotly_white',
-                width=800,
-                height=400
+                width=800,  # Fixed width
+                height=400  # Fixed height
             )
             fig_location.update_layout(
-                title_x=0.5,
-                title_y=0.95,
-                margin=dict(l=50, r=50, t=80, b=50),
-                autosize=True,
-                title_font=dict(size=16, family="Arial", color="white" if theme == "Dark" else "black"),
-                font=dict(size=12, family="Arial", color="white" if theme == "Dark" else "black")
+                title={
+                    'text': 'Top 10 Locations by Property Count',
+                    'y': 0.95,  # Fixed title position
+                    'x': 0.5,   # Fixed title position
+                    'xanchor': 'center',
+                    'yanchor': 'top',
+                    'font': {
+                        'size': 24,
+                        'family': 'Arial',
+                        'color': 'white' if theme == "Dark" else 'black',
+                        'weight': 'bold'
+                    }
+                },
+                margin=dict(l=50, r=50, t=80, b=50),  # Fixed margins
+                autosize=False,  # Disable autosize to maintain fixed dimensions
+                font=dict(
+                    size=12,
+                    family="Arial",
+                    color="white" if theme == "Dark" else "black"
+                ),
+                xaxis_title="Location",
+                yaxis_title="Number of Properties",
+                xaxis_title_font=dict(
+                    size=14,
+                    family="Arial",
+                    color="white" if theme == "Dark" else "black"
+                ),
+                yaxis_title_font=dict(
+                    size=14,
+                    family="Arial",
+                    color="white" if theme == "Dark" else "black"
+                )
             )
-            st.plotly_chart(fig_location, use_container_width=True)
+            st.plotly_chart(fig_location, use_container_width=False)  # Disable container width adjustment
             
             # Price vs Bedrooms
             st.markdown('<div class="section-subheader">Price vs Bedrooms</div>', unsafe_allow_html=True)
@@ -979,22 +1093,22 @@ def main():
                 y='Price',
                 title='Price Distribution by Location',
                 template='plotly_dark' if theme == "Dark" else 'plotly_white',
-                width=800,
-                height=400
+                width=800,  # Fixed width
+                height=400  # Fixed height
             )
             fig_price_loc.update_layout(
                 xaxis_tickangle=-45,
                 title_x=0.5,
                 title_y=0.95,
-                margin=dict(l=50, r=50, t=80, b=50),
-                autosize=True,
+                margin=dict(l=50, r=50, t=80, b=50),  # Fixed margins
+                autosize=False,  # Disable autosize to maintain fixed dimensions
                 title_font=dict(size=16, family="Arial", color="white" if theme == "Dark" else "black"),
                 font=dict(size=12, family="Arial", color="white" if theme == "Dark" else "black")
             )
-            st.plotly_chart(fig_price_loc, use_container_width=True)
+            st.plotly_chart(fig_price_loc, use_container_width=False)  # Disable container width adjustment
             
         with tab2:
-            st.markdown('<div class="section-header">Advanced Analysis</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-header">Analysis</div>', unsafe_allow_html=True)
             
             # Heatmap
             st.markdown('<div class="section-subheader">Feature Correlation Heatmap</div>', unsafe_allow_html=True)
