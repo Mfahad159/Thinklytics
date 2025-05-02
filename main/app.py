@@ -400,6 +400,29 @@ def apply_theme(theme):
             .stMarkdown div[data-testid="stMarkdownContainer"] > div {
                 background-color: transparent !important;
             }
+            .regression-summary {
+                background-color: #2D2D2D;
+                padding: 1.5rem;
+                border-radius: 8px;
+                margin: 1rem 0;
+                font-family: 'Courier New', monospace;
+                white-space: pre;
+                color: #FFFFFF;
+                overflow-x: auto;
+                line-height: 1.5;
+            }
+            .regression-header {
+                color: #4CAF50;
+                font-weight: bold;
+                margin-bottom: 1rem;
+                font-family: 'Courier New', monospace;
+            }
+            .regression-text {
+                font-family: 'Courier New', monospace;
+                white-space: pre;
+                color: #FFFFFF;
+                line-height: 1.5;
+            }
             </style>
         """, unsafe_allow_html=True)
     else:
@@ -752,7 +775,8 @@ logger = logging.getLogger(__name__)
 
 def create_heatmap(df, theme):
     """Create a correlation heatmap."""
-    fig = plt.figure(figsize=(9, 6.3), facecolor='none')  # Set transparent background
+    # Reduce figure size by 15%
+    fig = plt.figure(figsize=(3.5, 2.3), facecolor='none')  # Set transparent background
     ax = fig.add_subplot(111)
     numeric_df = df.select_dtypes(include=[np.number])
     correlation_matrix = numeric_df.corr()
@@ -762,28 +786,28 @@ def create_heatmap(df, theme):
         ax.set_facecolor('none')  # Transparent axis background
         sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f', 
                    linewidths=0.5, cbar_kws={'label': 'Correlation'}, ax=ax,
-                   annot_kws={'color': 'white'})
+                   annot_kws={'color': 'white', 'size': 8})  # Reduced annotation size
         # Set text colors for dark theme
         ax.xaxis.label.set_color('white')
         ax.yaxis.label.set_color('white')
         ax.title.set_color('white')
-        ax.tick_params(colors='white')
+        ax.tick_params(colors='white', labelsize=8)  # Reduced tick label size
         for spine in ax.spines.values():
             spine.set_color('white')
     else:
         ax.set_facecolor('none')  # Transparent axis background
         sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f', 
                    linewidths=0.5, cbar_kws={'label': 'Correlation'}, ax=ax,
-                   annot_kws={'color': 'black'})
+                   annot_kws={'color': 'black', 'size': 8})  # Reduced annotation size
         # Set text colors for light theme
         ax.xaxis.label.set_color('black')
         ax.yaxis.label.set_color('black')
         ax.title.set_color('black')
-        ax.tick_params(colors='black')
+        ax.tick_params(colors='black', labelsize=8)  # Reduced tick label size
         for spine in ax.spines.values():
             spine.set_color('black')
     
-    plt.title('Correlation Heatmap of Numeric Features', pad=15, fontsize=14, fontweight='bold')
+    plt.title('Correlation Heatmap of Numeric Features', pad=15, fontsize=12, fontweight='bold')  # Reduced title size
     plt.tight_layout(pad=1.5)
     
     # Set figure background to transparent
@@ -804,8 +828,8 @@ def format_price_pakistani(value):
 
 def create_price_distribution(df, theme):
     """Create price distribution plot."""
-    # Reduce figure size by 10%
-    fig = plt.figure(figsize=(7.2, 3.6), facecolor='none')  # Set transparent background
+    # Reduce figure size by additional 10%
+    fig = plt.figure(figsize=(5.0, 2.5), facecolor='none')  # Set transparent background
     ax = fig.add_subplot(111)
     
     if theme == "Dark":
@@ -851,37 +875,37 @@ def create_price_distribution(df, theme):
 
 def create_regression_analysis(df, theme):
     """Create regression analysis plots."""
-    # Reduce figure size by 10%
-    fig = plt.figure(figsize=(9, 5.4), facecolor='none')  # Set transparent background
+    # Reduce figure size by 15%
+    fig = plt.figure(figsize=(3.5, 2.3), facecolor='none')  # Set transparent background
     ax = fig.add_subplot(111)
     
     if theme == "Dark":
         plt.style.use('dark_background')
         ax.set_facecolor('none')  # Transparent axis background
         sns.regplot(x='Marla', y='Price', data=df, color='#4CAF50', 
-                   scatter_kws={'alpha':0.5}, ax=ax)
+                   scatter_kws={'alpha':0.5, 's': 20}, ax=ax)  # Reduced scatter point size
         # Set text colors for dark theme
         ax.xaxis.label.set_color('white')
         ax.yaxis.label.set_color('white')
         ax.title.set_color('white')
-        ax.tick_params(colors='white')
+        ax.tick_params(colors='white', labelsize=8)  # Reduced tick label size
         for spine in ax.spines.values():
             spine.set_color('white')
     else:
         ax.set_facecolor('none')  # Transparent axis background
         sns.regplot(x='Marla', y='Price', data=df, color='#1f77b4', 
-                   scatter_kws={'alpha':0.5}, ax=ax)
+                   scatter_kws={'alpha':0.5, 's': 20}, ax=ax)  # Reduced scatter point size
         # Set text colors for light theme
         ax.xaxis.label.set_color('black')
         ax.yaxis.label.set_color('black')
         ax.title.set_color('black')
-        ax.tick_params(colors='black')
+        ax.tick_params(colors='black', labelsize=8)  # Reduced tick label size
         for spine in ax.spines.values():
             spine.set_color('black')
     
-    plt.title('Price vs Property Size (Marla)', pad=15, fontsize=14, fontweight='bold')
-    plt.xlabel('Property Size (Marla)', fontsize=11)
-    plt.ylabel('Price (Rs.)', fontsize=11)
+    plt.title('Price vs Property Size (Marla)', pad=15, fontsize=12, fontweight='bold')  # Reduced title size
+    plt.xlabel('Property Size (Marla)', fontsize=9)  # Reduced label size
+    plt.ylabel('Price (Rs.)', fontsize=9)  # Reduced label size
     plt.grid(True, alpha=0.2, color='white' if theme == "Dark" else 'black')
     
     # Adjust layout to prevent cutoff
@@ -1338,7 +1362,7 @@ def main():
                 st.markdown('<div class="regression-summary">', unsafe_allow_html=True)
                 
                 # Header
-                st.markdown('<div class="regression-header">OLS Regression Results</div>', unsafe_allow_html=True)
+                st.markdown('<div class="section-subheader">OLS Regression Results</div>', unsafe_allow_html=True)
                 
                 # Display the full regression summary with proper formatting
                 summary_text = regression_results["model_summary"]
