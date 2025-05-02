@@ -792,6 +792,16 @@ def create_heatmap(df, theme):
     
     return fig
 
+def format_price_pakistani(value):
+    """Format price in Pakistani numbering system (lakhs, crores)."""
+    if value >= 10000000:  # 1 crore
+        return f"{value/10000000:.2f}Cr"
+    elif value >= 100000:  # 1 lakh
+        return f"{value/100000:.2f}L"
+    elif value >= 1000:
+        return f"{value/1000:.0f}K"
+    return f"{value:.0f}"
+
 def create_price_distribution(df, theme):
     """Create price distribution plot."""
     # Reduce figure size by 10%
@@ -821,9 +831,14 @@ def create_price_distribution(df, theme):
             spine.set_color('black')
     
     plt.title('Price Distribution', pad=15, fontsize=14, fontweight='bold')
-    plt.xlabel('Price (Rs.)', fontsize=11)
+    plt.xlabel('Price', fontsize=11)
     plt.ylabel('Frequency', fontsize=11)
     plt.grid(True, alpha=0.2, color='white' if theme == "Dark" else 'black')
+    
+    # Format x-axis ticks in Pakistani numbering system
+    current_values = ax.get_xticks()
+    ax.set_xticklabels([format_price_pakistani(x) for x in current_values])
+    plt.xticks(rotation=45)  # Rotate labels for better readability
     
     # Adjust layout to prevent cutoff
     plt.tight_layout(pad=1.5)
@@ -963,9 +978,9 @@ def main():
         locations = st.sidebar.multiselect(
             "Select Locations",
             options=available_locations,
-            default=available_locations[:5] if len(available_locations) > 5 else available_locations
+            default=available_locations[:10] if len(available_locations) > 10 else available_locations
         )
-        
+
         # Apply filters
         filtered_df = processed_df[
             (processed_df['Price'].between(price_range[0], price_range[1])) &
