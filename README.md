@@ -8,6 +8,8 @@ A comprehensive data analysis and visualization tool for real estate market insi
 - **Statistical Analysis**: Detailed statistical insights including regression analysis
 - **Market Insights**: Automated market analysis and predictions
 - **Advanced Filtering**: Multi-parameter filtering system for data exploration
+- **Personalized Rent Prediction**: Instantly see your most likely monthly rent based on property size (Marla), bedrooms, and location, using a data-driven model.  
+  _Look for the "Your Most Likely Monthly Rent" section in the dashboard!_
 - **Dark Theme**: Responsive UI with theme support
 
 ## Installation
@@ -78,6 +80,11 @@ streamlit run main/app.py
 - Distribution analysis
 - Multiple regression modeling
 
+### Personalized Rent Prediction
+- Get an instant, data-driven estimate of your most likely monthly rent
+- Adjust Marla, bedrooms, and location filters to see updated predictions
+- Interactive, collapsible section with themed styling for clarity and focus
+
 ## Dependencies
 
 - Python 3.8+
@@ -103,3 +110,7 @@ streamlit run main/app.py
 - Data source: Zameen.com
 - Built with Streamlit
 - Statistical analysis powered by SciPy and Statsmodels
+
+## Contributors
+
+- [Nawal-Akhlaq](https://github.com/Nawal-Akhlaq)

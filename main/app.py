@@ -33,6 +33,7 @@ from advanced_analysis import (
 from streamlit_extras.metric_cards import style_metric_cards
 from streamlit_extras.stylable_container import stylable_container
 import streamlit.components.v1 as components
+import statsmodels.api as sm
 
 # Set page config must be the first Streamlit command
 st.set_page_config(
@@ -422,6 +423,53 @@ def apply_theme(theme):
                 white-space: pre;
                 color: #FFFFFF;
                 line-height: 1.5;
+            }
+            .stExpander {
+                border: 1px solid #4CAF50;
+                border-radius: 8px;
+                margin: 1rem 0;
+            }
+            .stExpander .streamlit-expanderHeader {
+                background: linear-gradient(90deg, #2D2D2D 0%, #1E1E1E 100%);
+                color: #4CAF50;
+                padding: 1.2rem;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+                position: relative;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-left: 4px solid #4CAF50;
+            }
+            .stExpander .streamlit-expanderHeader:hover {
+                background: linear-gradient(90deg, #3D3D3D 0%, #2D2D2D 100%);
+            }
+            .stExpander .streamlit-expanderHeader span {
+                text-align: center;
+                font-weight: bold;
+                letter-spacing: 0.5px;
+                font-size: 1.1rem;
+                text-transform: uppercase;
+                background: linear-gradient(45deg, #4CAF50, #FFFFFF);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                padding-right: 1.5rem;
+            }
+            .stExpander .streamlit-expanderHeader::after {
+                content: "▼";
+                position: absolute;
+                right: 1rem;
+                transition: transform 0.3s ease;
+                color: #4CAF50;
+            }
+            .stExpander .streamlit-expanderHeader[aria-expanded="true"]::after {
+                transform: rotate(180deg);
+            }
+            .stExpander .streamlit-expanderContent {
+                background-color: #2D2D2D;
+                padding: 1rem;
+                border-radius: 0 0 8px 8px;
             }
             </style>
         """, unsafe_allow_html=True)
@@ -977,14 +1025,14 @@ def main():
         # Sidebar with filters
         st.sidebar.markdown("### Filters")
         
-        # Price range filter
-        min_price = int(processed_df['Price'].min())
-        max_price = int(processed_df['Price'].max())
-        price_range = st.sidebar.slider(
-            "Price Range (Rs.)",
-            min_price,
-            max_price,
-            (min_price, max_price)
+        # Marla range filter
+        min_marla = int(processed_df['Marla'].min())
+        max_marla = int(processed_df['Marla'].max())
+        marla_range = st.sidebar.slider(
+            "Property Size Range (Marla)",
+            min_marla,
+            max_marla,
+            (min_marla, max_marla)
         )
         
         # Bedrooms filter
@@ -1005,12 +1053,21 @@ def main():
             default=available_locations[:10] if len(available_locations) > 10 else available_locations
         )
 
-        # Apply filters
-        filtered_df = processed_df[
-            (processed_df['Price'].between(price_range[0], price_range[1])) &
-            (processed_df['Bedrooms'].isin(bedrooms)) &
-            (processed_df['Location'].isin(locations))
-        ]
+        # Apply filters with error handling
+        try:
+            filtered_df = processed_df[
+                (processed_df['Marla'].between(marla_range[0], marla_range[1])) &
+                (processed_df['Bedrooms'].isin(bedrooms)) &
+                (processed_df['Location'].isin(locations))
+            ]
+            
+            # If filtered_df is empty, show a message and use the full dataset
+            if len(filtered_df) == 0:
+                st.warning("No properties match the selected criteria. Showing all properties.")
+                filtered_df = processed_df.copy()
+        except Exception as e:
+            st.error(f"Error applying filters: {str(e)}")
+            filtered_df = processed_df.copy()
         
         # Main content
         st.markdown('<div class="header-container">', unsafe_allow_html=True)
@@ -1021,6 +1078,69 @@ def main():
             <p class="slogan" style="margin-top: -1rem;">Transforming Property Data into Intelligent Decisions</p>
             ''', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
+
+        # Expandable Price Prediction Container
+        with st.expander("Estimated Monthly Rent for Selected Filters", expanded=False):
+            # Get selected Marla value (use the upper bound of the range)
+            selected_marla = marla_range[1]  # Use the selected Marla value directly
+            avg_bedrooms = np.mean(bedrooms) if bedrooms else processed_df['Bedrooms'].mean()
+            
+            # Create a simple linear regression model for prediction
+            X = filtered_df[['Marla', 'Bedrooms']]
+            y = filtered_df['Price']
+            model = sm.OLS(y, sm.add_constant(X)).fit()
+            
+            # Predict price
+            predicted_price = model.predict([1, selected_marla, avg_bedrooms])[0]
+            
+            # Display prediction in a styled container
+            st.markdown(f"""
+                <div style='
+                    background: linear-gradient(90deg, #2D2D2D 0%, #1E1E1E 100%);
+                    padding: 1.5rem;
+                    border-radius: 8px;
+                    margin: 1rem 0;
+                    border-left: 4px solid #4CAF50;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                '>
+                    <h3 style='
+                        color: #4CAF50;
+                        margin-bottom: 1rem;
+                        text-align: center;
+                        font-size: 1.5rem;
+                        font-weight: bold;
+                        letter-spacing: 1px;
+                        text-transform: uppercase;
+                    '>Your Most Likely Monthly Rent</h3>
+                    <p style='
+                        font-size: 1.5rem;
+                        color: white;
+                        text-align: center;
+                        margin: 1rem 0;
+                        font-weight: bold;
+                    '>
+                        Rs. {predicted_price:,.0f}
+                    </p>
+                    <div style='
+                        background-color: #1E1E1E;
+                        padding: 1rem;
+                        border-radius: 6px;
+                        margin-top: 1rem;
+                    '>
+                        <p style='
+                            color: #888;
+                            font-size: 0.9rem;
+                            margin: 0;
+                            line-height: 1.6;
+                        '>
+                            Based on:
+                            <br>- Property Size: {selected_marla:.1f} Marla
+                            <br>- Bedrooms: {avg_bedrooms:.1f}
+                            <br>- Selected Locations: {', '.join(locations[:3])}{'...' if len(locations) > 3 else ''}
+                        </p>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
         
         # Key metrics with icons
         col1, col2, col3, col4 = st.columns(4)
@@ -1044,9 +1164,9 @@ def main():
         # Tabs for different sections
         tab1, tab2, tab3, tab4 = st.tabs([
             "Trends", 
-            "Standard Analysis", 
+            "Analysis", 
             "Insights",
-            "Statistical Analysis"
+            "Statistics"
         ])
         
         with tab1:
