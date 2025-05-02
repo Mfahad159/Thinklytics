@@ -103,3 +103,7 @@ streamlit run main/app.py
 - Data source: Zameen.com
 - Built with Streamlit
 - Statistical analysis powered by SciPy and Statsmodels
+
+
+## Contributors
+- Nawal-Akhlaq (https://github.com/Nawal-Akhlaq): Helped with Analysis part on dataset.csv
