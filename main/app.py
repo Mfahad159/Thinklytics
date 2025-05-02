@@ -1025,25 +1025,24 @@ def main():
                 x=location_counts.index,
                 y=location_counts.values,
                 template='plotly_dark' if theme == "Dark" else 'plotly_white',
-                width=800,  # Fixed width
-                height=400  # Fixed height
+                width=None,
+                height=None
             )
             fig_location.update_layout(
                 title={
                     'text': 'Top 10 Locations by Property Count',
-                    'y': 0.95,  # Fixed title position
-                    'x': 0.5,   # Fixed title position
+                    'y': 0.95,
+                    'x': 0.5,
                     'xanchor': 'center',
                     'yanchor': 'top',
                     'font': {
-                        'size': 24,
+                        'size': 18,
                         'family': 'Arial',
-                        'color': 'white' if theme == "Dark" else 'black',
-                        'weight': 'bold'
+                        'color': 'white' if theme == "Dark" else 'black'
                     }
                 },
-                margin=dict(l=50, r=50, t=80, b=50),  # Fixed margins
-                autosize=False,  # Disable autosize to maintain fixed dimensions
+                margin=dict(l=50, r=50, t=80, b=50),
+                autosize=True,
                 font=dict(
                     size=12,
                     family="Arial",
@@ -1060,9 +1059,11 @@ def main():
                     size=14,
                     family="Arial",
                     color="white" if theme == "Dark" else "black"
-                )
+                ),
+                showlegend=False,
+                xaxis={'tickangle': -45}
             )
-            st.plotly_chart(fig_location, use_container_width=False)  # Disable container width adjustment
+            st.plotly_chart(fig_location, use_container_width=True)
             
             # Price vs Bedrooms
             st.markdown('<div class="section-subheader">Price vs Bedrooms</div>', unsafe_allow_html=True)
@@ -1072,16 +1073,42 @@ def main():
                 y='Price',
                 title='Price Distribution by Number of Bedrooms',
                 template='plotly_dark' if theme == "Dark" else 'plotly_white',
-                width=800,
-                height=400
+                width=None,
+                height=None
             )
             fig_price_bed.update_layout(
-                title_x=0.5,
-                title_y=0.95,
+                title={
+                    'text': 'Price Distribution by Number of Bedrooms',
+                    'y': 0.95,
+                    'x': 0.5,
+                    'xanchor': 'center',
+                    'yanchor': 'top',
+                    'font': {
+                        'size': 18,
+                        'family': 'Arial',
+                        'color': 'white' if theme == "Dark" else 'black'
+                    }
+                },
                 margin=dict(l=50, r=50, t=80, b=50),
                 autosize=True,
-                title_font=dict(size=16, family="Arial", color="white" if theme == "Dark" else "black"),
-                font=dict(size=12, family="Arial", color="white" if theme == "Dark" else "black")
+                font=dict(
+                    size=12,
+                    family="Arial",
+                    color="white" if theme == "Dark" else "black"
+                ),
+                xaxis_title="Number of Bedrooms",
+                yaxis_title="Price (Rs.)",
+                xaxis_title_font=dict(
+                    size=14,
+                    family="Arial",
+                    color="white" if theme == "Dark" else "black"
+                ),
+                yaxis_title_font=dict(
+                    size=14,
+                    family="Arial",
+                    color="white" if theme == "Dark" else "black"
+                ),
+                showlegend=False
             )
             st.plotly_chart(fig_price_bed, use_container_width=True)
             
@@ -1093,19 +1120,45 @@ def main():
                 y='Price',
                 title='Price Distribution by Location',
                 template='plotly_dark' if theme == "Dark" else 'plotly_white',
-                width=800,  # Fixed width
-                height=400  # Fixed height
+                width=None,
+                height=None
             )
             fig_price_loc.update_layout(
-                xaxis_tickangle=-45,
-                title_x=0.5,
-                title_y=0.95,
-                margin=dict(l=50, r=50, t=80, b=50),  # Fixed margins
-                autosize=False,  # Disable autosize to maintain fixed dimensions
-                title_font=dict(size=16, family="Arial", color="white" if theme == "Dark" else "black"),
-                font=dict(size=12, family="Arial", color="white" if theme == "Dark" else "black")
+                title={
+                    'text': 'Price Distribution by Location',
+                    'y': 0.95,
+                    'x': 0.5,
+                    'xanchor': 'center',
+                    'yanchor': 'top',
+                    'font': {
+                        'size': 18,
+                        'family': 'Arial',
+                        'color': 'white' if theme == "Dark" else 'black'
+                    }
+                },
+                margin=dict(l=50, r=50, t=80, b=50),
+                autosize=True,
+                font=dict(
+                    size=12,
+                    family="Arial",
+                    color="white" if theme == "Dark" else "black"
+                ),
+                xaxis_title="Location",
+                yaxis_title="Price (Rs.)",
+                xaxis_title_font=dict(
+                    size=14,
+                    family="Arial",
+                    color="white" if theme == "Dark" else "black"
+                ),
+                yaxis_title_font=dict(
+                    size=14,
+                    family="Arial",
+                    color="white" if theme == "Dark" else "black"
+                ),
+                xaxis={'tickangle': -45},
+                showlegend=False
             )
-            st.plotly_chart(fig_price_loc, use_container_width=False)  # Disable container width adjustment
+            st.plotly_chart(fig_price_loc, use_container_width=True)
             
         with tab2:
             st.markdown('<div class="section-header">Analysis</div>', unsafe_allow_html=True)
@@ -1162,6 +1215,10 @@ def main():
                     f"{len(filtered_df):,} Properties",
                     f"Across {len(filtered_df['Location'].unique())} Locations"
                 )
+              # Overall Summary Section (Add this first)
+            st.markdown('<div class="section-subheader">Overall Summary</div>', unsafe_allow_html=True)
+            with st.container():
+                st.markdown(insights["overall_summary"], unsafe_allow_html=True)
             
         with tab4:
             st.markdown('<div class="section-header">Statistical Analysis</div>', unsafe_allow_html=True)
@@ -1285,7 +1342,7 @@ def main():
         st.markdown("""
             <div class="footer">
                 <div class="footer-content">
-                    <div class="app-name" style="text-align: center; width: 100%;"><span style="color: white; font-size: 0.8em; font-weight: normal;">Powered by: </span>ThinkLytics</div>
+                    <div class="app-name" style="text-align: center; width: 100%;">ThinkLytics</div>
                     <div class="app-slogan" style="text-align: center; width: 100%;">Transforming Property Data into Intelligent Decisions</div>
                 </div>
             </div>

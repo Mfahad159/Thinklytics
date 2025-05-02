@@ -132,9 +132,33 @@ def get_market_insights(df):
         summary = analyzer.generate_summary(df)
         predictions = analyzer.generate_predictions(df)
         
+        # Generate overall summary by analyzing all results
+        price_range = (df['Price'].min(), df['Price'].max())
+        price_std = df['Price'].std()
+        price_mean = df['Price'].mean()
+        top_locations = df['Location'].value_counts().head(3)
+        price_location_corr = df.groupby('Location')['Price'].mean().std() / price_mean
+        
+        # Determine market characteristics
+        market_state = "stable" if price_std/price_mean < 0.5 else "volatile"
+        variability = "moderate" if 0.2 <= price_std/price_mean <= 0.5 else ("high" if price_std/price_mean > 0.5 else "low")
+        concentration = "high" if top_locations.sum()/len(df) > 0.5 else "moderate"
+        price_dist = "uniform" if price_location_corr < 0.3 else ("moderately varied" if price_location_corr < 0.6 else "highly varied")
+        recommendation = "favorable conditions" if price_location_corr < 0.4 else "opportunities"
+        
+        # Create the overall summary
+        overall_summary = f"""Overall Market Analysis:
+
+Based on our comprehensive analysis, the property market shows **{market_state}** characteristics. 
+The market demonstrates a price spread of Rs. {price_range[1] - price_range[0]:,.0f}, with a **{variability}** degree of variability 
+(σ = {price_std:,.0f}). The top performing areas - **{', '.join(top_locations.index)}** - account for a significant portion of listings, 
+indicating {concentration} market concentration. Price variations across locations show {price_dist} distribution 
+(CV = {price_location_corr:.2f}), suggesting {recommendation} for investment diversification."""
+        
         return {
             "summary": summary,
-            "predictions": predictions
+            "predictions": predictions,
+            "overall_summary": overall_summary
         }
     except Exception as e:
         logger.error(f"Error in get_market_insights: {str(e)}")
@@ -144,5 +168,6 @@ def get_market_insights(df):
         
         return {
             "summary": f"Market Summary:\n- Average property price: Rs. {avg_price:,.0f}\n- Top locations: {', '.join(top_locations.index)}",
-            "predictions": "Market predictions currently unavailable. Please try again later."
+            "predictions": "Market predictions currently unavailable. Please try again later.",
+            "overall_summary": "Overall summary currently unavailable. Please try again later."
         } 
