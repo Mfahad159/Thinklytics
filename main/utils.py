@@ -3,6 +3,17 @@ import numpy as np
 import re
 from typing import Union, Optional
 
+def format_price_pakistani(value):
+    """Format price in Pakistani numbering system (lakhs, crores)."""
+    if value >= 10000000:  # 1 crore
+        return f"{value/10000000:.2f}Cr"
+    elif value >= 100000:  # 1 lakh
+        return f"{value/100000:.2f}L"
+    elif value >= 1000:
+        return f"{value/1000:.0f}K"
+    return f"{value:.0f}"
+
+
 def parse_price(price_str: Union[str, float]) -> float:
     """
     Convert price strings with 'Lakh', 'Thousand', or 'Crore' to numeric values.
